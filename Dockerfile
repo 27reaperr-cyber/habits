@@ -22,14 +22,16 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Копируем исходный код
 COPY bot.py .
 
-# Копируем .env если есть (можно передавать через -e или --env-file)
-COPY .env* ./
-
 # Создаём директорию для базы данных
 RUN mkdir -p data
 
 # Монтируй сюда volume чтобы БД сохранялась между перезапусками:
 #   docker run -v $(pwd)/data:/app/data ...
 VOLUME ["/app/data"]
+
+# Переменные окружения передаются через --env-file при запуске.
+# .env НЕ копируется в образ — передавай снаружи:
+#   docker run --env-file .env -v $(pwd)/data:/app/data task_bot
+#   docker-compose автоматически читает .env из папки проекта
 
 CMD ["python", "-u", "bot.py"]
